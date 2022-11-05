@@ -1,0 +1,10 @@
+server:
+  addr: localhost
+  port: 8080
+database:
+  dsn: postgresql://user:password@localhost:5432/banner
+rabbit:
+  dsn: amqp://localhost:5672
+  exchange: "stats"
+  queue: "stats"
+  tag: "banners-stat"

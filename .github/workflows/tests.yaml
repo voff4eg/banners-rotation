@@ -1,0 +1,51 @@
+name: Project tests
+
+on:
+  push:
+    branches:
+      - master
+
+env:
+  GO111MODULE: "on"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ~1.19
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Linters
+        uses: golangci/golangci-lint-action@v3
+        with:
+          version: v1.48.0
+
+  tests:
+    runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3.8
+        env:
+          RABBITMQ_DEFAULT_USER: guest
+          RABBITMQ_DEFAULT_PASS: guest
+        ports:
+          - "5672:5672"
+    steps:
+      - name: Set up Go
+        uses: actions/setup-go@v3
+        with:
+          go-version: ~1.19
+
+      - name: Check out code
+        uses: actions/checkout@v3
+
+      - name: Unit tests
+        run: go test -v -count=1 -race -timeout=1m ./internal/...
+
+      - name: Integrations tests
+        run: go test -v -timeout=1m ./test/integration/...
